@@ -1,0 +1,2 @@
+"0","# Check if there is any clear of relationship pattern"
+"0","pairs.panels(df, method = ""spearman"")"
