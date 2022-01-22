@@ -1,0 +1,3 @@
+# Modeling the Customer Purchasing Decisions at Dapur Putih Cafe in Metro City using Linear Regression
+
+on progress...
