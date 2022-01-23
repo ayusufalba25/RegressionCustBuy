@@ -1,5 +1,5 @@
 "0","# Split the data into train and test set"
 "0","set.seed(123)"
-"0","train_set = sample(1:nrow(df), round(0.8 * nrow(df), 0))"
+"0","train_set = sample(1:nrow(df), round(0.9 * nrow(df), 0))"
 "0","df_train <- df[train_set,]"
 "0","df_test <- df[-train_set,]"

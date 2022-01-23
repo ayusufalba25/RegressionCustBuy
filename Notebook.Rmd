@@ -59,34 +59,41 @@ boxplot(df$consider_buying)
 boxplot(df$price)
 boxplot(df$product_quality)
 ```
-From each of the boxplot we can see that there is no outliers in the data. Then, we could prepare the data for modeling by split the data into training and test set with 80:20 ratios.
+From each of the boxplot we can see that there is no outliers in the data. Then, we could prepare the data for modeling by splitting the data randomly into training and test set with 90:10 ratios.
 
 ```{r}
 # Split the data into train and test set
 set.seed(123)
-train_set = sample(1:nrow(df), round(0.8 * nrow(df), 0))
+train_set = sample(1:nrow(df), round(0.9 * nrow(df), 0))
 df_train <- df[train_set,]
 df_test <- df[-train_set,]
 ```
+
+Then, we fit the data using linear regression.
 
 ```{r}
 # Fitting linear regression model
 model <- lm(consider_buying ~ ., data = df_train)
 summary(model)
-plot(model)
 ```
+
+We use 5% significance level in our hypothesis testing for the inference in the regression modeling. Unfortunately, we can see that our independent variables is not simultaneously significant. It is shown from the p-value of F-statistic that is 0.09043 and it is less than the 5% significance level. Therefore, we cannot solve the main problem statement based on our independent variables.
+
+For each of the regression coefficient (beta), we can see that product_quality is the only one that does not have significant effect on the dependent variable. It is based on its p-value (Pr>|t|) with 0.71261 that less than 5% significance level. We can remove this independent variable from to get the best model for our problem.
+
+Furthermore, we can see that our model has R-squared with 10.13% and it is relatively low. It could be solved by adding mode independent variables in the linear regression model. But, in this experiment there are only two independent variables that we could use for modeling. Maybe, the researcher should consider to add more independent variables that could explain the costumer consideration in the experiment to decide whether they want to buy the products of Dapur Putih Cafe or not. The investigation to add more independent variables could be done by studying more pieces of literature to get a better understanding for deciding which independent variables she could use.
+
+Then, we need to remove product_quality from the model and fit the linear regression model once again.
 
 ```{r}
 # Fitting linear regression model but without product_quality
 model <- lm(consider_buying ~ price, data = df_train)
 summary(model)
-plot(model)
-```
-```{r}
-# Removing outliers which are the 7th, 17th, and 24th rows in the training data
-
 ```
 
+The adjusted R-squared from the evaluated model is higher than the initial model that has product_quality as its second independent variable. The R-squared is also has a relatively the same value, it just drop from 10.13% to 10.11%. Therefore, we can conclude that our that our evaluated model is better than the initial model.
+
+After that, we can check if our model is valid by checking if the assumption is already fulfilled. There are two main assumption that we need to check which are the normality of the residual and the homoscedasticity of its residual variance.
 
 
 ```{r}
@@ -99,11 +106,11 @@ shapiro.test(model$residuals)
 bptest(model)
 ```
 
+From both of the Shapiro-Wilk and Breusch-Pagan test we can conclude that our model is valid. The model's residuals has normal distribution and its variance is homoscedastic. It is shown by the p-value of each test that is greater than 5% significance level.
 
+Therefore, we can generate insights from the model by interpreting its regression coefficient. From the model, we can conclude that price has a significant effect on consider_buying as its dependent variable with a 0.2744 coefficient value. From its coefficient value, the price has a positive effect on consider_buying. It means that the more value and affordable the prices are than the customer is likely to buy products from Dapur Putih Cafe.
 
-```{r}
-
-```
+Next, we need to calculate our model's prediction performance using Root Mean Squared Error (RMSE) and Mean Absolute Percentage Error (MAPE) for the test set.
 
 ```{r}
 # Prediction performance
@@ -125,22 +132,30 @@ mape <- function(y_true, y_pred){
 cat("MAPE =", mape(df_test$consider_buying, y_test_pred))
 ```
 
-```{r}
-# Check the difference
-cbind(df_test$consider_buying, round(y_test_pred, 0))
-```
+Our model has good performance for predicting the customer consideration to buy the Dapur Putih Cafe's products from its prices (affordability and value). RMSE and MAPE that we have got are 1.197779 and 5.774701 respectively.
+
 
 ```{r}
 # Clustering customers
-cluster_customer <- kmeans(df, 2)
+cluster_customer <- kmeans(df[-3], 2)
 cluster_customer
 ```
 
 ```{r}
-
+# Add a column to store cluster
+df <- df %>% select(-product_quality) %>% mutate(cluster = cluster_customer$cluster)
+df
 ```
+
 
 ```{r}
-
+# Create a plot to visualize the cluster
+ggplot(df, aes(price, consider_buying)) +
+  geom_point(aes(colour = cut(cluster, c(-Inf, 1.5, Inf)))) +
+  scale_color_manual(name = "Cluster",
+                     values = c("(-Inf,1.5]" = "black",
+                                  "(1.5, Inf]" = "red"),
+                     labels = c("Cluster 1", "Cluster 2"))
 ```
+
 
