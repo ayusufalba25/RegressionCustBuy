@@ -42,7 +42,6 @@ summary(model)
 # Fitting linear regression model but without product_quality
 model <- lm(consider_buying ~ price, data = df_train)
 summary(model)
-plot(model)
 
 # Normality test for residual
 shapiro.test(model$residuals)
