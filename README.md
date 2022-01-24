@@ -448,7 +448,9 @@ investigation to add more independent variables could be done by
 studying more pieces of literature to get a better understanding for
 deciding which independent variables could be used.
 
-Beside of that, our model can be used to predict
+RMSE and MAPE that we have got for the test data are 1.197779 and
+5.774701 respectively. It means that our model has a good performance to
+predict the consider_buying variable.
 
 ## Reference
 
